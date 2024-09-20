@@ -1,56 +1,52 @@
 <script>
-    // Service list data
+    import { fade, fly } from 'svelte/transition';
+
     let services = [
         { id: 1, name: 'Consultation', description: 'General health checkup', price: 50 },
         { id: 2, name: 'X-Ray', description: 'Full body scan', price: 100 },
     ];
 
     let newService = { name: '', description: '', price: '' };
-    let editIndex = null;  // To track the index of the service being edited
+    let editIndex = null;
 
-    // Add new service function
     const addService = () => {
         if (newService.name && newService.description && newService.price) {
             services = [...services, { ...newService, id: services.length + 1 }];
-            newService = { name: '', description: '', price: '' }; // Clear the form
+            newService = { name: '', description: '', price: '' };
         }
     };
 
-    // Delete service function
     const deleteService = (index) => {
         services = services.filter((_, i) => i !== index);
     };
 
-    // Update service function
     const editService = (index) => {
-        newService = { ...services[index] }; // Load the service to the form for editing
+        newService = { ...services[index] };
         editIndex = index;
     };
 
     const updateService = () => {
         if (editIndex !== null) {
             services[editIndex] = { ...newService };
-            newService = { name: '', description: '', price: '' }; // Clear the form
-            editIndex = null; // Exit edit mode
+            newService = { name: '', description: '', price: '' };
+            editIndex = null;
         }
     };
 </script>
-
-<!-- List of Services -->
-<h2>Healthcare Services</h2>
 <ul>
-    {#each services as service, index}
-        <li>
+    {#each services as service, index (service.id)}
+        <li transition:fade>
             <strong>{service.name}</strong>: {service.description} - ${service.price}
             <button on:click={() => editService(index)}>Edit</button>
-            <button on:click={() => deleteService(index)}>Delete</button>
+            <button on:click={() => deleteService(index)} transition:fly={{ y: 20, duration: 400 }}>Delete</button>
         </li>
     {/each}
 </ul>
+<h3 transition:fly={{ x: -100, duration: 300 }}>
+    {editIndex !== null ? 'Edit' : 'Add'} Service
+</h3>
 
-<!-- Form to Add/Edit Service -->
-<h3>{editIndex !== null ? 'Edit' : 'Add'} Service</h3>
-<form on:submit|preventDefault={editIndex !== null ? updateService : addService}>
+<form on:submit|preventDefault={editIndex !== null ? updateService : addService} transition:fly={{ x: -100, duration: 300 }}>
     <label>Name</label>
     <input type="text" bind:value={newService.name} required />
 
@@ -72,6 +68,7 @@
         margin: 20px 0;
         display: flex;
         flex-direction: column;
+        transition: transform 0.3s ease;
     }
 
     label {
@@ -92,6 +89,7 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        transition: background-color 0.3s ease;
     }
 
     button:hover {
@@ -109,11 +107,13 @@
         background-color: #f9f9f9;
         border: 1px solid #ccc;
         border-radius: 4px;
+        transition: transform 0.3s ease;
     }
 
     li button {
         margin-left: 10px;
         background-color: #FF4136;
+        transition: background-color 0.3s ease;
     }
 
     li button:first-child {
